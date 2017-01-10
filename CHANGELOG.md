@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.2.0
+
+- Added/fixed, depending on your perspective: If focus is already inside the focus trap when it is activated, leave focus where it is instead of forcing it to the first tabbable node or `initialFocus`.
+
+## 2.1.0
+
+- Added: `fallbackFocus` option.
+
+## 2.0.2
+
+- Fixed: `clickOutsideDeactivates` no longer triggers deactivation when you click *inside* the trap.
+
+## 2.0.1
+
+- Fix bug when activating multiple focus traps.
+
+## 2.0.0
+
+- Rewrote the thing, altering the API. Read the new docs please.
+- Update `tabbable` to fix handling of traps with changing contents.
+
 ## 1.1.1
 
 - Improve `clickOutsideDeactivates` functionality.

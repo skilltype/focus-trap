@@ -145,6 +145,103 @@
     </p>
   </div>
 
+  <h2 id="demo-five-heading">demo five</h2>
+  <p>
+    Focusable nodes are initially hidden and then revealed within the trap.
+  </p>
+  <p>
+    <button id="activate-five">
+      activate trap 5
+    </button>
+  </p>
+  <div id="demo-five" class="trap" tabindex="-1">
+    <p>
+      <button>
+        nothing
+      </button>
+    </p>
+    <p>
+      <button id="demo-five-show-more">
+        click to show more
+      </button>
+    </p>
+    <div id="demo-five-more" style="display:none;">
+      <p>
+        <button>
+          nothing again
+        </button>
+      </p>
+      <p>
+        <button id="demo-five-show-less">
+          click to show less
+        </button>
+      </p>
+    </div>
+  </div>
+
+  <h2 id="demo-six-heading">demo six</h2>
+  <p>
+    Nested focus traps
+  </p>
+  <p>
+    <button id="activate-six">
+      activate trap 6
+    </button>
+  </p>
+  <div id="demo-six" class="trap" tabindex="-1" style="display:none;">
+    <p>
+      <button id="deactivate-six">
+        deactive outer trap
+      </button>
+    </p>
+    <p>
+      <button id="demo-six-activate-nested">
+        active inner trap
+      </button>
+    </p>
+    <div id="demo-six-nested" style="display:none;padding:5px 10px;background:pink;">
+      <p>
+        <button>
+          nothing
+        </button>
+      </p>
+      <p>
+        <button id="demo-six-deactivate-nested">
+          deactivate and close inner trap
+        </button>
+      </p>
+    </div>
+  </div>
+
+  <h2 id="demo-seven-heading">demo seven</h2>
+  <p>
+    In this focus traps, the single focusable button are hidden.
+    If you activate the trap in this state, the "fallbackFocus" option is used to focus the container.
+    If, however, you make the focusable button visible, it will receive focus when you activate the trap.
+  </p>
+  <p>
+    <button id="activate-seven">
+      activate trap 7
+    </button>
+  </p>
+  <div id="demo-seven" class="trap" tabindex="-1">
+    <p>
+      <button id="deactivate-seven" tabindex="-1">
+        deactivate trap 7
+      </button>
+    </p>
+    <p>
+      <button id="demo-seven-show-focusable" tabindex="-1">
+        show focusable button
+      </button>
+    </p>
+    <p>
+      <button id="demo-seven-hide-focusable" style="display:none;">
+        hide focusable button
+      </button>
+    </p>
+  </div>
+
   <p>
     <span style="font-size:2em;vertical-align:middle;">☜</span>
     <a href="https://github.com/davidtheclark/focus-trap" style="vertical-align:middle;">Return to the repository</a>
