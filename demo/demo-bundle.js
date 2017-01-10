@@ -1,227 +1,404 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
-var focusTrap = require('../../');
+var createFocusTrap = require('../../');
 
-var el = document.getElementById('demo-four');
+var containerFive = document.getElementById('demo-five');
+var moreFive = document.getElementById('demo-five-more');
 
-document.getElementById('activate-four').addEventListener('click', function() {
-  focusTrap.activate('#demo-four', {
-    onDeactivate: removeActiveClass,
-    initialFocus: '#demo-four',
-  });
-  el.className = 'trap is-active';
+var focusTrapFive = createFocusTrap(containerFive, {
+  onActivate: function () {
+    containerFive.className = 'trap is-active';
+  },
+  onDeactivate: function () {
+    containerFive.className = 'trap';
+  },
 });
 
-document.getElementById('deactivate-four').addEventListener('click', function() {
-  focusTrap.deactivate();
-  removeActiveClass();
+document.getElementById('activate-five').addEventListener('click', function () {
+  focusTrapFive.activate();
 });
 
-function removeActiveClass() {
-  el.className = 'trap';
-}
-
-},{"../../":6}],2:[function(require,module,exports){
-var focusTrap = require('../../');
-
-var el = document.getElementById('demo-one');
-
-document.getElementById('activate-one').addEventListener('click', function() {
-  focusTrap.activate('#demo-one', {
-    onDeactivate: removeActiveClass,
-  });
-  el.className = 'trap is-active';
+document.getElementById('demo-five-show-more').addEventListener('click', function () {
+  moreFive.style.display = 'block';
 });
 
-document.getElementById('deactivate-one').addEventListener('click', function() {
-  focusTrap.deactivate();
-  removeActiveClass();
+document.getElementById('demo-five-show-less').addEventListener('click', function () {
+  moreFive.style.display = 'none';
 });
 
-function removeActiveClass() {
-  el.className = 'trap';
-}
+},{"../../":9}],2:[function(require,module,exports){
+var createFocusTrap = require('../../');
 
-},{"../../":6}],3:[function(require,module,exports){
-var focusTrap = require('../../');
+var containerFour = document.getElementById('demo-four');
 
-var el = document.getElementById('demo-three');
-
-document.getElementById('activate-three').addEventListener('click', function() {
-  focusTrap.activate(el, {
-    onDeactivate: removeActiveClass,
-    clickOutsideDeactivates: true,
-  });
-  el.className = 'trap is-active';
+var focusTrapfour = createFocusTrap('#demo-four', {
+  onActivate: function () {
+    containerFour.className = 'trap is-active';
+  },
+  onDeactivate: function () {
+    containerFour.className = 'trap';
+  },
+  initialFocus: '#demo-four',
 });
 
-document.getElementById('deactivate-three').addEventListener('click', function() {
-  focusTrap.deactivate();
-  removeActiveClass();
+document.getElementById('activate-four').addEventListener('click', function () {
+  focusTrapfour.activate();
 });
 
-function removeActiveClass() {
-  el.className = 'trap';
-}
-
-},{"../../":6}],4:[function(require,module,exports){
-var focusTrap = require('../../');
-
-var el = document.getElementById('demo-two');
-
-document.getElementById('activate-two').addEventListener('click', function() {
-  focusTrap.activate('#demo-two', {
-    onDeactivate: removeActiveClass,
-    initialFocus: '#focused-input',
-    escapeDeactivates: false,
-  });
-  el.className = 'trap is-active';
+document.getElementById('deactivate-four').addEventListener('click', function () {
+  focusTrapfour.deactivate();
 });
 
-document.getElementById('deactivate-two').addEventListener('click', function() {
-  focusTrap.deactivate();
-  removeActiveClass();
+},{"../../":9}],3:[function(require,module,exports){
+var createFocusTrap = require('../../');
+
+var containerOne = document.getElementById('demo-one');
+
+var focusTrapOne = createFocusTrap('#demo-one', {
+  onActivate: function () {
+    containerOne.className = 'trap is-active';
+  },
+  onDeactivate: function () {
+    containerOne.className = 'trap';
+  },
 });
 
-function removeActiveClass() {
-  el.className = 'trap';
-}
+document.getElementById('activate-one').addEventListener('click', function () {
+  focusTrapOne.activate();
+});
 
-},{"../../":6}],5:[function(require,module,exports){
+document.getElementById('deactivate-one').addEventListener('click', function () {
+  focusTrapOne.deactivate();
+});
+
+},{"../../":9}],4:[function(require,module,exports){
+var createFocusTrap = require('../../');
+
+var containerSeven = document.getElementById('demo-seven');
+var focusableSeven = document.getElementById('demo-seven-hide-focusable');
+
+var focusTrapSeven = createFocusTrap(containerSeven, {
+  fallbackFocus: containerSeven,
+  onActivate: function () {
+    containerSeven.className = 'trap is-active';
+  },
+  onDeactivate: function () {
+    containerSeven.className = 'trap';
+  },
+});
+
+document.getElementById('activate-seven').addEventListener('click', function () {
+  focusTrapSeven.activate();
+});
+
+document.getElementById('deactivate-seven').addEventListener('click', function () {
+  focusTrapSeven.deactivate();
+});
+
+document.getElementById('demo-seven-show-focusable').addEventListener('click', function () {
+  focusableSeven.style.display = 'block';
+});
+
+document.getElementById('demo-seven-hide-focusable').addEventListener('click', function () {
+  focusableSeven.style.display = 'none';
+});
+
+},{"../../":9}],5:[function(require,module,exports){
+var createFocusTrap = require('../../');
+
+var containerSix = document.getElementById('demo-six');
+var nestedSix = document.getElementById('demo-six-nested');
+
+var primaryFocusTrapSix = createFocusTrap('#demo-six', {
+  onActivate: function () {
+    containerSix.style.display = 'block';
+  },
+  onDeactivate: function () {
+    containerSix.style.display = 'none';
+  },
+});
+
+var nestedFocusTrapSix = createFocusTrap('#demo-six-nested', {
+  onActivate: function () {
+    nestedSix.style.display = 'block';
+  },
+  onDeactivate: function () {
+    nestedSix.style.display = 'none';
+    primaryFocusTrapSix.unpause();
+  },
+});;
+
+document.getElementById('activate-six').addEventListener('click', function () {
+  primaryFocusTrapSix.activate();
+});
+
+document.getElementById('deactivate-six').addEventListener('click', function () {
+  primaryFocusTrapSix.deactivate();
+});
+
+document.getElementById('demo-six-activate-nested').addEventListener('click', function () {
+  // primaryFocusTrapSix.pause();
+  nestedFocusTrapSix.activate();
+});
+
+document.getElementById('demo-six-deactivate-nested').addEventListener('click', function () {
+  nestedFocusTrapSix.deactivate();
+});
+
+},{"../../":9}],6:[function(require,module,exports){
+var createFocusTrap = require('../../');
+
+var containerThree = document.getElementById('demo-three');
+
+var focusTrapThree = createFocusTrap(containerThree, {
+  onActivate: function () {
+    containerThree.className = 'trap is-active';
+  },
+  onDeactivate: function () {
+    containerThree.className = 'trap';
+  },
+  clickOutsideDeactivates: true,
+});
+
+document.getElementById('activate-three').addEventListener('click', function () {
+  focusTrapThree.activate();
+});
+
+document.getElementById('deactivate-three').addEventListener('click', function () {
+  focusTrapThree.deactivate();
+});
+
+},{"../../":9}],7:[function(require,module,exports){
+var createFocusTrap = require('../../');
+
+var containerTwo = document.getElementById('demo-two');
+
+var focusTrapTwo = createFocusTrap(containerTwo, {
+  onActivate: function () {
+    containerTwo.className = 'trap is-active';
+  },
+  onDeactivate: function () {
+    containerTwo.className = 'trap';
+  },
+  initialFocus: '#focused-input',
+  escapeDeactivates: false,
+});
+
+document.getElementById('activate-two').addEventListener('click', function () {
+  focusTrapTwo.activate();
+});
+
+document.getElementById('deactivate-two').addEventListener('click', function () {
+  focusTrapTwo.deactivate();
+});
+
+},{"../../":9}],8:[function(require,module,exports){
 require('./demo-one');
 require('./demo-two');
 require('./demo-three');
 require('./demo-four');
+require('./demo-five');
+require('./demo-six');
+require('./demo-seven');
 
-},{"./demo-four":1,"./demo-one":2,"./demo-three":3,"./demo-two":4}],6:[function(require,module,exports){
+},{"./demo-five":1,"./demo-four":2,"./demo-one":3,"./demo-seven":4,"./demo-six":5,"./demo-three":6,"./demo-two":7}],9:[function(require,module,exports){
 var tabbable = require('tabbable');
 
-var trap;
-var tabbableNodes;
-var previouslyFocused;
-var activeFocusTrap;
-var config;
+var listeningFocusTrap = null;
 
-function activate(element, options) {
-  // There can be only one focus trap at a time
-  if (activeFocusTrap) deactivate({ returnFocus: false });
-  activeFocusTrap = true;
+function focusTrap(element, userOptions) {
+  var tabbableNodes = [];
+  var nodeFocusedBeforeActivation = null;
+  var active = false;
 
-  trap = (typeof element === 'string')
+  var container = (typeof element === 'string')
     ? document.querySelector(element)
     : element;
 
-  config = options || {};
+  var config = userOptions || {};
+  config.returnFocusOnDeactivate = (userOptions && userOptions.returnFocusOnDeactivate !== undefined)
+    ? userOptions.returnFocusOnDeactivate
+    : true;
+  config.escapeDeactivates = (userOptions && userOptions.escapeDeactivates !== undefined)
+    ? userOptions.escapeDeactivates
+    : true;
 
-  previouslyFocused = document.activeElement;
+  var trap = {
+    activate: activate,
+    deactivate: deactivate,
+    pause: removeListeners,
+    unpause: addListeners,
+  };
 
-  updateTabbableNodes();
+  return trap;
 
-  tryFocus(firstFocusNode());
+  function activate(activateOptions) {
+    var defaultedActivateOptions = {
+      onActivate: (activateOptions && activateOptions.onActivate !== undefined)
+        ? activateOptions.onActivate
+        : config.onActivate,
+    };
 
-  document.addEventListener('focus', checkFocus, true);
-  document.addEventListener('click', checkClick, true);
-  document.addEventListener('mousedown', checkClickInit, true);
-  document.addEventListener('touchstart', checkClickInit, true);
-  document.addEventListener('keydown', checkKey, true);
-}
+    active = true;
+    nodeFocusedBeforeActivation = document.activeElement;
 
-function firstFocusNode() {
-  var node;
+    if (defaultedActivateOptions.onActivate) {
+      defaultedActivateOptions.onActivate();
+    }
 
-  if (!config.initialFocus) {
-    node = tabbableNodes[0];
+    addListeners();
+    return trap;
+  }
+
+  function deactivate(deactivateOptions) {
+    var defaultedDeactivateOptions = {
+      returnFocus: (deactivateOptions && deactivateOptions.returnFocus !== undefined)
+        ? deactivateOptions.returnFocus
+        : config.returnFocusOnDeactivate,
+      onDeactivate: (deactivateOptions && deactivateOptions.onDeactivate !== undefined)
+        ? deactivateOptions.onDeactivate
+        : config.onDeactivate,
+    };
+
+    removeListeners();
+
+    if (defaultedDeactivateOptions.onDeactivate) {
+      defaultedDeactivateOptions.onDeactivate();
+    }
+
+    if (defaultedDeactivateOptions.returnFocus) {
+      setTimeout(function () {
+        tryFocus(nodeFocusedBeforeActivation);
+      }, 0);
+    }
+
+    active = false;
+    return this;
+  }
+
+  function addListeners() {
+    if (!active) return;
+
+    // There can be only one listening focus trap at a time
+    if (listeningFocusTrap) {
+      listeningFocusTrap.pause();
+    }
+    listeningFocusTrap = trap;
+
+    updateTabbableNodes();
+    tryFocus(firstFocusNode());
+    document.addEventListener('focus', checkFocus, true);
+    document.addEventListener('click', checkClick, true);
+    document.addEventListener('mousedown', checkPointerDown, true);
+    document.addEventListener('touchstart', checkPointerDown, true);
+    document.addEventListener('keydown', checkKey, true);
+
+    return trap;
+  }
+
+  function removeListeners() {
+    if (!active || listeningFocusTrap !== trap) return;
+
+    document.removeEventListener('focus', checkFocus, true);
+    document.removeEventListener('click', checkClick, true);
+    document.removeEventListener('mousedown', checkPointerDown, true);
+    document.removeEventListener('touchstart', checkPointerDown, true);
+    document.removeEventListener('keydown', checkKey, true);
+
+    listeningFocusTrap = null;
+
+    return trap;
+  }
+
+  function getNodeForOption(key) {
+    var node = config[key];
     if (!node) {
-      throw new Error('You can\'t have a focus-trap without at least one focusable element');
+      return null;
+    }
+    if (typeof node === 'string') {
+      node = document.querySelector(node);
+      if (!node) {
+        throw new Error('`' + key + '` refers to no known node');
+      }
     }
     return node;
   }
 
-  if (typeof config.initialFocus === 'string') {
-    node = document.querySelector(config.initialFocus);
-  } else {
-    node = config.initialFocus;
-  }
-  if (!node) {
-    throw new Error('The `initialFocus` selector you passed refers to no known node');
-  }
-  return node;
-}
-
-function deactivate(deactivationOptions) {
-  deactivationOptions = deactivationOptions || {};
-  if (!activeFocusTrap) return;
-  activeFocusTrap = false;
-
-  document.removeEventListener('focus', checkFocus, true);
-  document.removeEventListener('click', checkClick, true);
-  document.addEventListener('mousedown', checkClickInit, true);
-  document.addEventListener('touchstart', checkClickInit, true);
-  document.removeEventListener('keydown', checkKey, true);
-
-  if (config.onDeactivate) config.onDeactivate();
-
-  if (deactivationOptions.returnFocus !== false) {
-    setTimeout(function() {
-      tryFocus(previouslyFocused);
-    }, 0);
-  }
-}
-
-// This needs to be done on mousedown and touchstart instead of click
-// so that it precedes the focus event
-function checkClickInit(e) {
-  if (config.clickOutsideDeactivates) {
-    deactivate({ returnFocus: false });
-  }
-}
-
-function checkClick(e) {
-  if (config.clickOutsideDeactivates) return;
-  if (trap.contains(e.target)) return;
-  e.preventDefault();
-  e.stopImmediatePropagation();
-}
-
-function checkFocus(e) {
-  if (trap.contains(e.target)) return;
-  e.preventDefault();
-  e.stopImmediatePropagation();
-  e.target.blur();
-}
-
-function checkKey(e) {
-  if (e.key === 'Tab' || e.keyCode === 9) {
-    handleTab(e);
-  }
-
-  if (config.escapeDeactivates !== false && isEscapeEvent(e)) {
-    deactivate();
-  }
-}
-
-function handleTab(e) {
-  e.preventDefault();
-  updateTabbableNodes();
-  var currentFocusIndex = tabbableNodes.indexOf(e.target);
-  var lastTabbableNode = tabbableNodes[tabbableNodes.length - 1];
-  var firstTabbableNode = tabbableNodes[0];
-  if (e.shiftKey) {
-    if (e.target === firstTabbableNode) {
-      tryFocus(lastTabbableNode);
-      return;
+  function firstFocusNode() {
+    var node;
+    if (getNodeForOption('initialFocus') !== null) {
+      node = getNodeForOption('initialFocus');
+    } else if (container.contains(document.activeElement)) {
+      node = document.activeElement;
+    } else {
+      node = tabbableNodes[0] || getNodeForOption('fallbackFocus');
     }
-    tryFocus(tabbableNodes[currentFocusIndex - 1]);
-    return;
+
+    if (!node) {
+      throw new Error('You can\'t have a focus-trap without at least one focusable element');
+    }
+
+    return node;
   }
-  if (e.target === lastTabbableNode) {
-    tryFocus(firstTabbableNode);
-    return;
+
+  // This needs to be done on mousedown and touchstart instead of click
+  // so that it precedes the focus event
+  function checkPointerDown(e) {
+    if (config.clickOutsideDeactivates && !container.contains(e.target)) {
+      deactivate({ returnFocus: false });
+    }
   }
-  tryFocus(tabbableNodes[currentFocusIndex + 1]);
+
+  function checkClick(e) {
+    if (config.clickOutsideDeactivates) return;
+    if (container.contains(e.target)) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  }
+
+  function checkFocus(e) {
+    if (container.contains(e.target)) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    // Checking for a blur method here resolves a Firefox issue (#15)
+    if (typeof e.target.blur === 'function') e.target.blur();
+  }
+
+  function checkKey(e) {
+    if (e.key === 'Tab' || e.keyCode === 9) {
+      handleTab(e);
+    }
+
+    if (config.escapeDeactivates !== false && isEscapeEvent(e)) {
+      deactivate();
+    }
+  }
+
+  function handleTab(e) {
+    e.preventDefault();
+    updateTabbableNodes();
+    var currentFocusIndex = tabbableNodes.indexOf(e.target);
+    var lastTabbableNode = tabbableNodes[tabbableNodes.length - 1];
+    var firstTabbableNode = tabbableNodes[0];
+
+    if (e.shiftKey) {
+      if (e.target === firstTabbableNode || tabbableNodes.indexOf(e.target) === -1) {
+        return tryFocus(lastTabbableNode);
+      }
+      return tryFocus(tabbableNodes[currentFocusIndex - 1]);
+    }
+
+    if (e.target === lastTabbableNode) return tryFocus(firstTabbableNode);
+
+    tryFocus(tabbableNodes[currentFocusIndex + 1]);
+  }
+
+  function updateTabbableNodes() {
+    tabbableNodes = tabbable(container);
+  }
 }
 
-function updateTabbableNodes() {
-  tabbableNodes = tabbable(trap);
+function isEscapeEvent(e) {
+  return e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27;
 }
 
 function tryFocus(node) {
@@ -232,22 +409,27 @@ function tryFocus(node) {
   }
 }
 
-function isEscapeEvent(e) {
-  return e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27;
-}
+module.exports = focusTrap;
 
-module.exports = {
-  activate: activate,
-  deactivate: deactivate,
-};
-
-},{"tabbable":7}],7:[function(require,module,exports){
+},{"tabbable":10}],10:[function(require,module,exports){
 module.exports = function(el) {
   var basicTabbables = [];
   var orderedTabbables = [];
 
-  var candidateNodelist = el.querySelectorAll('input, select, a, textarea, button, [tabindex]');
-  var candidates = Array.prototype.slice.call(candidateNodelist);
+  // A node is "available" if
+  // - it's computed style
+  var isUnavailable = createIsUnavailable();
+
+  var candidateSelectors = [
+    'input',
+    'select',
+    'a[href]',
+    'textarea',
+    'button',
+    '[tabindex]',
+  ];
+
+  var candidates = el.querySelectorAll(candidateSelectors);
 
   var candidate, candidateIndex;
   for (var i = 0, l = candidates.length; i < l; i++) {
@@ -257,9 +439,8 @@ module.exports = function(el) {
     if (
       candidateIndex < 0
       || (candidate.tagName === 'INPUT' && candidate.type === 'hidden')
-      || (candidate.tagName === 'A' && !candidate.href && !candidate.tabIndex)
       || candidate.disabled
-      || isHidden(candidate)
+      || isUnavailable(candidate)
     ) {
       continue;
     }
@@ -287,30 +468,48 @@ module.exports = function(el) {
   return tabbableNodes;
 }
 
-var nodeCache = {};
-var nodeCacheIndex = 1;
-function isHidden(node) {
-  if (node === document.documentElement) {
-    return false;
+function createIsUnavailable() {
+  // Node cache must be refreshed on every check, in case
+  // the content of the element has changed
+  var isOffCache = [];
+
+  // "off" means `display: none;`, as opposed to "hidden",
+  // which means `visibility: hidden;`. getComputedStyle
+  // accurately reflects visiblity in context but not
+  // "off" state, so we need to recursively check parents.
+
+  function isOff(node, nodeComputedStyle) {
+    if (node === document.documentElement) return false;
+
+    // Find the cached node (Array.prototype.find not available in IE9)
+    for (var i = 0, length = isOffCache.length; i < length; i++) {
+      if (isOffCache[i][0] === node) return isOffCache[i][1];
+    }
+
+    nodeComputedStyle = nodeComputedStyle || window.getComputedStyle(node);
+
+    var result = false;
+
+    if (nodeComputedStyle.display === 'none') {
+      result = true;
+    } else if (node.parentNode) {
+      result = isOff(node.parentNode);
+    }
+
+    isOffCache.push([node, result]);
+
+    return result;
   }
 
-  if (node.tabbableCacheIndex) {
-    return nodeCache[node.tabbableCacheIndex];
+  return function isUnavailable(node) {
+    if (node === document.documentElement) return false;
+
+    var computedStyle = window.getComputedStyle(node);
+
+    if (isOff(node, computedStyle)) return true;
+
+    return computedStyle.visibility === 'hidden';
   }
-
-  var result = false;
-  var style = window.getComputedStyle(node);
-  if (style.visibility === 'hidden' || style.display === 'none') {
-    result = true;
-  } else if (node.parentNode) {
-    result = isHidden(node.parentNode);
-  }
-
-  node.tabbableCacheIndex = nodeCacheIndex;
-  nodeCache[node.tabbableCacheIndex] = result;
-  nodeCacheIndex++;
-
-  return result;
 }
 
-},{}]},{},[5]);
+},{}]},{},[8]);
