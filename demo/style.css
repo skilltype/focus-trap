@@ -12,9 +12,7 @@ body {
   padding: 10px;
 }
 
-input:focus,
-a:focus,
-button:focus {
+*:focus {
   outline: 5px solid lightblue;
 }
 
@@ -31,6 +29,13 @@ button:focus {
   margin-right: 0.5em;
 }
 
-#demo-four {
+#demo-four,
+#initial-nine {
   outline: 0;
+}
+
+code, kbd {
+  background: #eee;
+  font-size: 90%;
+  padding: 0 2px;
 }

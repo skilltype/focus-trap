@@ -4,15 +4,13 @@ Trap focus within a DOM node.
 
 There may come a time when you find it important to trap focus within a DOM node — so that when a user hits `Tab` or `Shift+Tab` or clicks around, she can't escape a certain cycle of focusable elements.
 
-You will definitely face this challenge when you are try to build **accessible modals or dropdown menus**.
+You will definitely face this challenge when you are try to build **accessible modals**.
 
-This module is a little **vanilla JS** solution to that problem.
+This module is a little, modular **vanilla JS** solution to that problem.
 
-If you are using React, check out [focus-trap-react](https://github.com/davidtheclark/focus-trap-react), a light wrapper around this library. If you are not a React user, consider creating light wrappers in your framework-of-choice!
+Use it in your higher-level components. For example, if you are using React check out [focus-trap-react](https://github.com/davidtheclark/focus-trap-react), a light wrapper around this library. If you are not a React user, consider creating light wrappers in your framework-of-choice.
 
 ## What it does
-
-[Check out the demos.](http://davidtheclark.github.io/focus-trap/demo/)
 
 When a focus trap is activated, this is what should happen:
 
@@ -26,6 +24,8 @@ When the focus trap is deactivated, this is what should happen:
 - Focus is passed to *whichever element had focus when the trap was activated* (e.g. the button that opened the modal or menu).
 - Tabbing and clicking behave normally everywhere.
 
+[Check out the demos.](http://davidtheclark.github.io/focus-trap/demo/)
+
 For more advanced usage (e.g. focus traps within focus traps), you can also pause a focus trap's behavior without deactivating it entirely, then unpause at will.
 
 ## Installation
@@ -33,6 +33,8 @@ For more advanced usage (e.g. focus traps within focus traps), you can also paus
 ```
 npm install focus-trap
 ```
+
+You can also use a UMD version published to `unpkg.com` as `dist/focus-trap.js` and `dist/focus-trap.min.js`.
 
 ## Browser Support
 
@@ -56,13 +58,13 @@ Returns a new focus trap on `element`.
 
 - **onActivate** {function}: A function that will be called when the focus trap activates.
 - **onDeactivate** {function}: A function that will be called when the focus trap deactivates,
-- **initialFocus** {element|string}: By default, when a focus trap is activated the first element in the focus trap's tab order will receive focus. With this option you can specify a different element to receive that initial focus. Can be a DOM node or a selector string (which will be passed to `document.querySelector()` to find the DOM node).
-- **fallbackFocus** {element|string}: By default, an error will be thrown if the focus trap contains no elements in its tab order. With this option you can specify a fallback element to programmatically receive focus if no other tabbable elements are found. For example, you may want a popover's `<div>` to receive focus if the popover's content includes no tabbable elements. *Make sure the fallback element has a negative `tabindex` so it can be programmatically focused.* The option value can be a DOM node or a selector string (which will be passed to `document.querySelector()` to find the DOM node).
+- **initialFocus** {element|string|function}: By default, when a focus trap is activated the first element in the focus trap's tab order will receive focus. With this option you can specify a different element to receive that initial focus. Can be a DOM node, or a selector string (which will be passed to `document.querySelector()` to find the DOM node), or a function that returns a DOM node.
+- **fallbackFocus** {element|string|function}: By default, an error will be thrown if the focus trap contains no elements in its tab order. With this option you can specify a fallback element to programmatically receive focus if no other tabbable elements are found. For example, you may want a popover's `<div>` to receive focus if the popover's content includes no tabbable elements. *Make sure the fallback element has a negative `tabindex` so it can be programmatically focused.* The option value can be a DOM node, a selector string (which will be passed to `document.querySelector()` to find the DOM node), or  a function that returns a DOM node.
 - **escapeDeactivates** {boolean}: Default: `true`. If `false`, the `Escape` key will not trigger deactivation of the focus trap. This can be useful if you want to force the user to make a decision instead of allowing an easy way out.
 - **clickOutsideDeactivates** {boolean}: Default: `false`. If `true`, a click outside the focus trap will deactivate the focus trap and allow the click event to do its thing.
 - **returnFocusOnDeactivate** {boolean}: Default: `true`. If `false`, when the trap is deactivated, focus will *not* return to the element that had focus before activation.
 
-### focusTrap.activate()
+### focusTrap.activate([activateOptions])
 
 Activates the focus trap, adding various event listeners to the document.
 
@@ -75,6 +77,12 @@ If focus is already within it the trap, it remains unaffected. Otherwise, focus-
 If none of the above exist, an error will be thrown. You cannot have a focus trap that lacks focus.
 
 Returns the `focusTrap`.
+
+`activateOptions`:
+
+These options are used to override the focus trap's default behavior for this particular activation.
+
+- **onActivate** {function | null | false}: Default: whatever you chose for `createOptions.onActivate`. `null` or `false` are the equivalent of a `noop`.
 
 ### focusTrap.deactivate([deactivateOptions])
 
@@ -113,7 +121,7 @@ Returns the `focusTrap`.
 
 ## Examples
 
-Read code in `demo/` (it's very simple), and [see how it works](http://davidtheclark.github.io/focus-trap/demo/).
+Read code in `demo/` and [see how it works](http://davidtheclark.github.io/focus-trap/demo/).
 
 Here's what happens in `demo-one.js`:
 
@@ -139,7 +147,23 @@ document.getElementById('deactivate-one').addEventListener('click', function () 
 
 ## Other details
 
-- *Only one focus trap can be listening at a time.* So if you want two focus traps active at a time, one of them has to be paused.
+### One at a time
+
+*Only one focus trap can be listening at a time.* So if you want two focus traps active at a time, one of them has to be paused.
+
+### Use predictable elements for the first and last tabbable elements in your trap
+
+The focus trap will work best if the *first* and *last* focusable elements in your trap are simple elements that all browsers treat the same, like buttons and inputs.**
+
+Tabbing will work as expected with trickier, less predictable elements — like iframes, shadow trees, audio and video elements, etc. — as long as they are *between* more predictable elements (that is, if they are not the first or last tabbable element in the trap).
+
+This limitation is ultimately rooted in browser inconsistencies and inadequacies, but it comes to focus-trap through its dependency [Tababble](https://github.com/davidtheclark/tabbable). You can read about more details [in the Tabbable documentation](https://github.com/davidtheclark/tabbable#more-details).
+
+### Your trap should include a tabbable element or a focusable container
+
+You can't have a focus trap without focus, so an error will be thrown if you try to initialize focus-trap with an element that contains no tabbable nodes.
+
+If you find yourself in this situation, you should give you container `tabindex="-1"` and set it as `initialFocus` or `fallbackFocus`. A couple of demos illustrate this.
 
 ## Development
 
