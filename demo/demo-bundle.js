@@ -64,7 +64,7 @@
             focusTrap.deactivate();
           });
       },
-      { '../../': 12 }
+      { '../../': 13 }
     ],
     2: [
       function(require, module, exports) {
@@ -93,7 +93,7 @@
           focusTrap.deactivate();
         }
       },
-      { '../../': 12 }
+      { '../../': 13 }
     ],
     3: [
       function(require, module, exports) {
@@ -129,7 +129,7 @@
             more.style.display = 'none';
           });
       },
-      { '../../': 12 }
+      { '../../': 13 }
     ],
     4: [
       function(require, module, exports) {
@@ -158,7 +158,7 @@
             focusTrap.deactivate();
           });
       },
-      { '../../': 12 }
+      { '../../': 13 }
     ],
     5: [
       function(require, module, exports) {
@@ -167,6 +167,7 @@
         require('./initially-focused-container');
         require('./hidden-treasures');
         require('./nested');
+        require('./sibling');
         require('./tricky-initial-focus');
         require('./input-activation');
         require('./delay');
@@ -183,7 +184,8 @@
         './input-activation': 8,
         './nested': 9,
         './radio': 10,
-        './tricky-initial-focus': 11
+        './sibling': 11,
+        './tricky-initial-focus': 12
       }
     ],
     6: [
@@ -215,7 +217,7 @@
             focusTrap.deactivate();
           });
       },
-      { '../../': 12 }
+      { '../../': 13 }
     ],
     7: [
       function(require, module, exports) {
@@ -248,7 +250,7 @@
             focusTrap.deactivate();
           });
       },
-      { '../../': 12 }
+      { '../../': 13 }
     ],
     8: [
       function(require, module, exports) {
@@ -277,7 +279,7 @@
             focusTrap.deactivate();
           });
       },
-      { '../../': 12 }
+      { '../../': 13 }
     ],
     9: [
       function(require, module, exports) {
@@ -326,7 +328,7 @@
             nestedFocusTrap.deactivate();
           });
       },
-      { '../../': 12 }
+      { '../../': 13 }
     ],
     10: [
       function(require, module, exports) {
@@ -355,9 +357,58 @@
             focusTrap.deactivate();
           });
       },
-      { '../../': 12 }
+      { '../../': 13 }
     ],
     11: [
+      function(require, module, exports) {
+        var createFocusTrap = require('../../');
+
+        var container = document.getElementById('sibling-first');
+        var second = document.getElementById('sibling-second');
+
+        var firstFocusTrap = createFocusTrap('#sibling-first', {
+          onDeactivate: function() {
+            container.className = 'trap';
+          }
+        });
+
+        var secondFocusTrap = createFocusTrap('#sibling-second', {
+          onDeactivate: function() {
+            second.style.display = 'none';
+            second.className = 'trap';
+          }
+        });
+
+        document
+          .getElementById('activate-first-sibling')
+          .addEventListener('click', function() {
+            container.className = 'trap is-active';
+            firstFocusTrap.activate();
+          });
+
+        document
+          .getElementById('deactivate-first-sibling')
+          .addEventListener('click', function() {
+            firstFocusTrap.deactivate();
+          });
+
+        document
+          .getElementById('activate-second-sibling')
+          .addEventListener('click', function() {
+            second.style.display = 'block';
+            second.className = 'trap is-active';
+            secondFocusTrap.activate();
+          });
+
+        document
+          .getElementById('deactivate-second-sibling')
+          .addEventListener('click', function() {
+            secondFocusTrap.deactivate();
+          });
+      },
+      { '../../': 13 }
+    ],
+    12: [
       function(require, module, exports) {
         var createFocusTrap = require('../../');
 
@@ -398,14 +449,46 @@
             focusable.style.display = 'none';
           });
       },
-      { '../../': 12 }
+      { '../../': 13 }
     ],
-    12: [
+    13: [
       function(require, module, exports) {
         var tabbable = require('tabbable');
         var xtend = require('xtend');
 
-        var listeningFocusTrap = null;
+        var activeFocusTraps = (function() {
+          var trapQueue = [];
+          return {
+            activateTrap: function(trap) {
+              if (trapQueue.length > 0) {
+                var activeTrap = trapQueue[trapQueue.length - 1];
+                if (activeTrap !== trap) {
+                  activeTrap.pause();
+                }
+              }
+
+              var trapIndex = trapQueue.indexOf(trap);
+              if (trapIndex === -1) {
+                trapQueue.push(trap);
+              } else {
+                // move this existing trap to the front of the queue
+                trapQueue.splice(trapIndex, 1);
+                trapQueue.push(trap);
+              }
+            },
+
+            deactivateTrap: function(trap) {
+              var trapIndex = trapQueue.indexOf(trap);
+              if (trapIndex !== -1) {
+                trapQueue.splice(trapIndex, 1);
+              }
+
+              if (trapQueue.length > 0) {
+                trapQueue[trapQueue.length - 1].unpause();
+              }
+            }
+          };
+        })();
 
         function focusTrap(element, userOptions) {
           var doc = document;
@@ -466,6 +549,8 @@
             state.active = false;
             state.paused = false;
 
+            activeFocusTraps.deactivateTrap(trap);
+
             var onDeactivate =
               deactivateOptions && deactivateOptions.onDeactivate !== undefined
                 ? deactivateOptions.onDeactivate
@@ -503,10 +588,7 @@
             if (!state.active) return;
 
             // There can be only one listening focus trap at a time
-            if (listeningFocusTrap) {
-              listeningFocusTrap.pause();
-            }
-            listeningFocusTrap = trap;
+            activeFocusTraps.activateTrap(trap);
 
             updateTabbableNodes();
 
@@ -525,15 +607,13 @@
           }
 
           function removeListeners() {
-            if (!state.active || listeningFocusTrap !== trap) return;
+            if (!state.active) return;
 
             doc.removeEventListener('focusin', checkFocusIn, true);
             doc.removeEventListener('mousedown', checkPointerDown, true);
             doc.removeEventListener('touchstart', checkPointerDown, true);
             doc.removeEventListener('click', checkClick, true);
             doc.removeEventListener('keydown', checkKey, true);
-
-            listeningFocusTrap = null;
 
             return trap;
           }
@@ -683,9 +763,9 @@
 
         module.exports = focusTrap;
       },
-      { tabbable: 13, xtend: 14 }
+      { tabbable: 14, xtend: 15 }
     ],
-    13: [
+    14: [
       function(require, module, exports) {
         var candidateSelectors = [
           'input',
@@ -913,7 +993,7 @@
       },
       {}
     ],
-    14: [
+    15: [
       function(require, module, exports) {
         module.exports = extend;
 
