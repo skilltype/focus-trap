@@ -781,9 +781,11 @@
         var candidateSelector = candidateSelectors.join(',');
 
         var matches =
-          Element.prototype.matches ||
-          Element.prototype.msMatchesSelector ||
-          Element.prototype.webkitMatchesSelector;
+          typeof Element === 'undefined'
+            ? function() {}
+            : Element.prototype.matches ||
+              Element.prototype.msMatchesSelector ||
+              Element.prototype.webkitMatchesSelector;
 
         function tabbable(el, options) {
           options = options || {};
@@ -956,7 +958,7 @@
           node,
           nodeComputedStyle
         ) {
-          if (node === this.doc.documentElement) return false;
+          if (node.nodeType !== Node.ELEMENT_NODE) return false;
 
           // Search for a cached result.
           var cached = find(this.cache, function(item) {
