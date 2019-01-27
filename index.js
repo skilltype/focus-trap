@@ -61,7 +61,8 @@ function focusTrap(element, userOptions) {
     mostRecentlyFocusedNode: null,
     active: false,
     paused: false,
-    advanceOnUnpause: 0
+    advanceOnUnpause: 0,
+    ignoreForwardTabs: false
   };
 
   var trap = {
@@ -71,7 +72,9 @@ function focusTrap(element, userOptions) {
     unpause: unpause,
     destroy: destroy,
     advance: advanceTabbable,
-    advanceOnUnpause: advanceOnUnpause
+    advanceOnUnpause: advanceOnUnpause,
+    ignoreForwardTabs: ignoreForwardTabs,
+    stopIgnoringForwardTabs: stopIgnoringForwardTabs
   };
 
   if (!config.trapFocus) {
@@ -169,6 +172,14 @@ function focusTrap(element, userOptions) {
     state.paused = false;
     addListeners();
     tryFocus(state.mostRecentlyFocusedNode);
+  }
+
+  function ignoreForwardTabs() {
+    state.ignoreForwardTabs = true;
+  }
+
+  function stopIgnoringForwardTabs() {
+    state.ignoreForwardTabs = false;
   }
 
   function advanceOnUnpause(incrementBy) {
@@ -299,6 +310,10 @@ function focusTrap(element, userOptions) {
     if (config.escapeDeactivates !== false && isEscapeEvent(e)) {
       e.preventDefault();
       deactivate();
+      return;
+    }
+    if (isNextTabEvent(e) && state.ignoreForwardTabs) {
+      e.preventDefault();
       return;
     }
     if (isNextEvent(e) || isPrevEvent(e)) {
