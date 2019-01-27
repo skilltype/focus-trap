@@ -9,3 +9,7 @@ require('./input-activation');
 require('./delay');
 require('./radio');
 require('./iframe');
+require('./arrows-horizontal-only');
+require('./arrows-vertical-only');
+require('./arrows-only');
+require('./arrows');

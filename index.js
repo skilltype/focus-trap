@@ -43,37 +43,72 @@ function focusTrap(element, userOptions) {
   var config = xtend(
     {
       returnFocusOnDeactivate: true,
-      escapeDeactivates: true
+      escapeDeactivates: true,
+      trapHorizontalArrows: false,
+      trapVerticalArrows: false,
+      trapTabs: true,
+      trapFocus: true
     },
     userOptions
   );
 
   var state = {
+    tabbableNodes: null,
     firstTabbableNode: null,
     lastTabbableNode: null,
+    activeTabbableNodeIndex: 0,
     nodeFocusedBeforeActivation: null,
     mostRecentlyFocusedNode: null,
     active: false,
-    paused: false
+    paused: false,
+    advanceOnUnpause: 0
   };
 
   var trap = {
     activate: activate,
     deactivate: deactivate,
     pause: pause,
-    unpause: unpause
+    unpause: unpause,
+    destroy: destroy,
+    advance: advanceTabbable,
+    advanceOnUnpause: advanceOnUnpause
   };
 
+  if (!config.trapFocus) {
+    container.addEventListener('focusin', checkContainerFocusIn, true);
+  }
+
+  updateTabbableNodes();
+
   return trap;
+
+  function updateActiveTabbableNode(e) {
+    var activeElement = doc.activeElement;
+    if (e && e.target) {
+      activeElement = e.target;
+    }
+    // if activeElement (focused) is in the container,
+    //   make it our active tabbable node
+    if (container.contains(activeElement)) {
+      state.tabbableNodes.forEach(function(node, idx) {
+        if (node === activeElement) {
+          state.activeTabbableNodeIndex = idx;
+          state.mostRecentlyFocusedNode = node;
+        }
+      });
+    }
+  }
 
   function activate(activateOptions) {
     if (state.active) return;
 
-    updateTabbableNodes();
+    // updateTabbableNodes();
 
     state.active = true;
     state.paused = false;
     state.nodeFocusedBeforeActivation = doc.activeElement;
+
+    updateActiveTabbableNode();
 
     var onActivate =
       activateOptions && activateOptions.onActivate
@@ -91,6 +126,7 @@ function focusTrap(element, userOptions) {
     if (!state.active) return;
 
     removeListeners();
+
     state.active = false;
     state.paused = false;
 
@@ -117,6 +153,11 @@ function focusTrap(element, userOptions) {
     return trap;
   }
 
+  function destroy() {
+    deactivate();
+    container.removeEventListener('focusin', checkContainerFocusIn, true);
+  }
+
   function pause() {
     if (state.paused || !state.active) return;
     state.paused = true;
@@ -127,6 +168,14 @@ function focusTrap(element, userOptions) {
     if (!state.paused || !state.active) return;
     state.paused = false;
     addListeners();
+    tryFocus(state.mostRecentlyFocusedNode);
+  }
+
+  function advanceOnUnpause(incrementBy) {
+    if (!state.paused || !state.active) return;
+    var nextActiveIndex = getNextActiveNodeIndex(incrementBy);
+    state.mostRecentlyFocusedNode = state.tabbableNodes[nextActiveIndex];
+    state.activeTabbableNodeIndex = nextActiveIndex;
   }
 
   function addListeners() {
@@ -135,7 +184,7 @@ function focusTrap(element, userOptions) {
     // There can be only one listening focus trap at a time
     activeFocusTraps.activateTrap(trap);
 
-    updateTabbableNodes();
+    // updateTabbableNodes();
 
     // Delay ensures that the focused element doesn't capture the event
     // that caused the focus trap activation.
@@ -209,21 +258,41 @@ function focusTrap(element, userOptions) {
     if (container.contains(e.target)) return;
     if (config.clickOutsideDeactivates) {
       deactivate({
-        returnFocus: !tabbable.isFocusable(e.target)
+        returnFocus: false
       });
-    } else {
-      e.preventDefault();
     }
+    // } else {
+    //   e.preventDefault();
+    // }
   }
 
   // In case focus escapes the trap for some strange reason, pull it back in.
   function checkFocusIn(e) {
-    // In Firefox when you Tab out of an iframe the Document is briefly focused.
+    // // In Firefox when you Tab out of an iframe the Document is briefly focused.
     if (container.contains(e.target) || e.target instanceof Document) {
       return;
     }
-    e.stopImmediatePropagation();
-    tryFocus(state.mostRecentlyFocusedNode || getInitialFocusNode());
+    if (!config.trapFocus) {
+      trap.deactivate({
+        returnFocus: false
+      });
+      return;
+    }
+    // e.stopImmediatePropagation();
+    // tryFocus(state.mostRecentlyFocusedNode || getInitialFocusNode());
+  }
+
+  // if we're not trapping focus, we want to allow the focus to come and go
+  //   but activate when container receives focus and pause when it
+  //   loses focus (latter handled in checkFocusIn)
+  function checkContainerFocusIn(e) {
+    if (config.trapFocus) {
+      return;
+    }
+    if (!state.active) {
+      trap.activate();
+      // the click may have focused a node, so update our activeIndex
+    }
   }
 
   function checkKey(e) {
@@ -232,31 +301,58 @@ function focusTrap(element, userOptions) {
       deactivate();
       return;
     }
-    if (isTabEvent(e)) {
-      checkTab(e);
+    if (isNextEvent(e) || isPrevEvent(e)) {
+      moveFocus(e);
       return;
     }
   }
 
-  // Hijack Tab events on the first and last focusable nodes of the trap,
-  // in order to prevent focus from escaping. If it escapes for even a
-  // moment it can end up scrolling the page and causing confusion so we
-  // kind of need to capture the action at the keydown phase.
-  function checkTab(e) {
-    updateTabbableNodes();
-    if (e.shiftKey && e.target === state.firstTabbableNode) {
-      e.preventDefault();
-      tryFocus(state.lastTabbableNode);
+  function moveFocus(e) {
+    // updateTabbableNodes();
+    var isTrappable = config.trapTabs || !isTabEvent(e);
+    if (isPrevEvent(e)) {
+      advanceTabbable(-1, isTrappable);
+    } else if (isNextEvent(e)) {
+      advanceTabbable(1, isTrappable);
+    } else {
       return;
     }
-    if (!e.shiftKey && e.target === state.lastTabbableNode) {
+    if (isTrappable) {
       e.preventDefault();
-      tryFocus(state.firstTabbableNode);
-      return;
+    }
+  }
+
+  function getNextActiveNodeIndex(incrementBy, skipWrap) {
+    var nextIndex = state.activeTabbableNodeIndex + incrementBy;
+    if (nextIndex === state.tabbableNodes.length) {
+      if (skipWrap) {
+        nextIndex = state.tabbableNodes.length - 1;
+      } else {
+        nextIndex = 0;
+      }
+    }
+    if (nextIndex < 0) {
+      if (skipWrap) {
+        nextIndex = 0;
+      } else {
+        nextIndex = state.tabbableNodes.length - 1;
+      }
+    }
+    return nextIndex;
+  }
+
+  function advanceTabbable(incrementBy, isTrappable) {
+    state.activeTabbableNodeIndex = getNextActiveNodeIndex(
+      incrementBy,
+      !isTrappable
+    );
+    if (isTrappable) {
+      tryFocus(state.tabbableNodes[state.activeTabbableNodeIndex]);
     }
   }
 
   function checkClick(e) {
+    updateActiveTabbableNode(e);
     if (config.clickOutsideDeactivates) return;
     if (container.contains(e.target)) return;
     e.preventDefault();
@@ -264,10 +360,18 @@ function focusTrap(element, userOptions) {
   }
 
   function updateTabbableNodes() {
-    var tabbableNodes = tabbable(container);
-    state.firstTabbableNode = tabbableNodes[0] || getInitialFocusNode();
+    state.tabbableNodes = tabbable(container);
+    state.firstTabbableNode = state.tabbableNodes[0] || getInitialFocusNode();
     state.lastTabbableNode =
-      tabbableNodes[tabbableNodes.length - 1] || getInitialFocusNode();
+      state.tabbableNodes[state.tabbableNodes.length - 1] ||
+      getInitialFocusNode();
+    // find active
+    state.activeTabbableNodeIndex = 0;
+    state.tabbableNodes.forEach(function(node, idx) {
+      if (node === document.activeElement) {
+        state.activeTabbableNodeIndex = idx;
+      }
+    });
   }
 
   function tryFocus(node) {
@@ -283,6 +387,42 @@ function focusTrap(element, userOptions) {
       node.select();
     }
   }
+
+  function isNextArrowEvent(e) {
+    return (
+      (config.trapHorizontalArrows &&
+        (e.key === 'ArrowRight' || e.keyCode === 39)) ||
+      (config.trapVerticalArrows && (e.key === 'ArrowDown' || e.keyCode === 40))
+    );
+  }
+
+  function isPrevArrowEvent(e) {
+    return (
+      (config.trapHorizontalArrows &&
+        (e.key === 'ArrowLeft' || e.keyCode === 37)) ||
+      (config.trapVerticalArrows && (e.key === 'ArrowUp' || e.keyCode === 38))
+    );
+  }
+
+  function isNextEvent(e) {
+    return isNextTabEvent(e) || isNextArrowEvent(e);
+  }
+
+  function isPrevEvent(e) {
+    return isPrevTabEvent(e) || isPrevArrowEvent(e);
+  }
+
+  function isTabEvent(e) {
+    return e.key === 'Tab' || e.keyCode === 9;
+  }
+
+  function isNextTabEvent(e) {
+    return isTabEvent(e) && !e.shiftKey;
+  }
+
+  function isPrevTabEvent(e) {
+    return isTabEvent(e) && e.shiftKey;
+  }
 }
 
 function isSelectableInput(node) {
@@ -295,10 +435,6 @@ function isSelectableInput(node) {
 
 function isEscapeEvent(e) {
   return e.key === 'Escape' || e.key === 'Esc' || e.keyCode === 27;
-}
-
-function isTabEvent(e) {
-  return e.key === 'Tab' || e.keyCode === 9;
 }
 
 function delay(fn) {
